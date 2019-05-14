@@ -1,2 +1,5 @@
 .vscode
 optimizations
+/**/*.elf
+/**/*.hex
+/**/*.bin
