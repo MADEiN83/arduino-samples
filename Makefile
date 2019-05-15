@@ -28,6 +28,12 @@ boards: ## Retrieve all boards
 build: ## Build given sketch
 	arduino-cli compile --fqbn $(FQBN) $(path)
 
+deploy: build
+	arduino-cli upload -p $(DEFAULT_PORT) --fqbn $(FQBN) $(path)
+	rm $(path)/*.elf
+
+## Method 2
+
 hex:
 	avr-gcc -Os -DF_CPU=8000000 -mmcu=$(MCU) -c $(path)
 	avr-gcc -DF_CPU=8000000 -mmcu=$(MCU) -o ${shell basename $(path) .c}.elf ${shell basename $(path) .c}.o
