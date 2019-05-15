@@ -1,6 +1,7 @@
 CORE:=arduino:avr
 FQBN:=arduino:avr:uno
 DEFAULT_PORT:=/dev/cu.usbmodem14401
+MCU:=ATmega328P
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MAKEFILE_PATH))))
@@ -14,18 +15,30 @@ demo: ## Just a simple demo code
 boards: ## Retrieve all boards
 	arduino-cli board list
 
-core:
-	arduino-cli core search arduino
+# core:
+# 	arduino-cli core search arduino
 
-mkr1000:
-	arduino-cli core search mkr1000
-	arduino-cli core install CORE
+# mkr1000:
+# 	arduino-cli core search mkr1000
+# 	arduino-cli core install CORE
 
-update-index:
-	arduino-cli core update-index
+# update-index:
+# 	arduino-cli core update-index
 
 build: ## Build given sketch
-	arduino-cli compile --fqbn $(FQBN) ${path}
+	arduino-cli compile --fqbn $(FQBN) $(path)
 
-upload: build ## Upload given sketch to arduino card
-	arduino-cli upload -p $(DEFAULT_PORT) --fqbn $(FQBN) ${path}
+hex:
+	avr-gcc -Os -DF_CPU=8000000 -mmcu=$(MCU) -c $(path)
+	avr-gcc -DF_CPU=8000000 -mmcu=$(MCU) -o ${shell basename $(path) .c}.elf ${shell basename $(path) .c}.o
+	avr-objcopy -O ihex ${shell basename $(path) .c}.elf ${shell dirname $(path)}/${shell basename $(path) .c}.hex
+	rm ${shell basename $(path) .c}.elf ${shell basename $(path) .c}.o
+
+# hex:
+# 	avr-gcc -Os -DF_CPU=8000000 -mmcu=$(MCU) -c oui.c
+# 	avr-gcc -DF_CPU=8000000 -mmcu=$(MCU) -o oui.elf oui.o
+# 	avr-objcopy -O ihex oui.elf oui.hex
+# 	rm oui.o oui.elf
+
+flash: hex
+	avrdude -c arduino -p $(MCU) -P $(DEFAULT_PORT) -U flash:w:${shell dirname $(path)}/${shell basename $(path) .c}.hex

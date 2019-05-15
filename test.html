@@ -1,0 +1,33 @@
+<script>
+  let DDRD = 0;
+  let DDRB = 0;
+
+  const INPUT = 0;
+  const OUTPUT = 1;
+  const log = (t, p) => {
+    p = p.toString(2);
+    while (p.length < 8) p = "0" + p;
+    console.log(t, p);
+  };
+
+  /****/
+  const getBtw = pin => 1 << pin % 8;
+  const pinMode = (pin, mode) => {
+    const btw = getBtw(pin);
+
+    if (pin > 8) {
+      DDRB = mode === 1 ? DDRB | btw : (DDRB &= ~btw);
+      return;
+    }
+
+    DDRD = mode === 1 ? DDRD | btw : (DDRD &= ~btw);
+  };
+  /****/
+
+  pinMode(6, OUTPUT);
+  pinMode(3, OUTPUT);
+  log("[DDRD] Add 6, 3", DDRD);
+
+  pinMode(3, INPUT);
+  log("[DDRD] Del 3", DDRD);
+</script>
