@@ -1,5 +1,5 @@
 int pin = A0;
-int limit = 300; 
+int limit = 300;
 
 void setup()
 {
@@ -16,11 +16,14 @@ void loop()
     Serial.print(value);
     Serial.println("%");
 
-    if(value > 50) {
-      digitalWrite(13, HIGH);
-    } else {
-      digitalWrite(13, LOW);
+    if (value > 50)
+    {
+        digitalWrite(13, HIGH);
     }
-    
+    else
+    {
+        digitalWrite(13, LOW);
+    }
+
     delay(200);
 }
