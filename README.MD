@@ -22,6 +22,10 @@ http://www.nongnu.org/avr-libc/
 
 http://gcc.gnu.org/wiki/avr-gcc
 
+https://garretlab.web.fc2.com/en/arduino/inside/arduino/wiring_digital.c/pinMode.html
+
+https://github.com/arduino/ArduinoCore-samd/blob/master/cores/arduino/wiring_digital.c
+
 |     | BYTES      | TYPE   | CALCUL        |
 | --- | ---------- | ------ | ------------- |
 | 1   | 0x00000010 | `DDRD` | 1 << (1 % 8)  |
@@ -62,4 +66,17 @@ PORTD |= 10010000; // turns on "4" & "7" - equivalent digitalWrite(4 | 7, HIGH)
 ...
 PORTB |= 00010000; // turns on "12" - equivalent digitalWrite(12, HIGH)
 PORTB |= 00110101; // turns on "13" & "12" & "10" & "8" - equivalent digitalWrite(13 | 12 | 10 | 8, HIGH)
+```
+
+## docker - arduino environment
+
+```bash
+docker build -t arduino .
+docker run -it -v $(pwd)/projects:/usr/src/app arduino bash
+```
+
+All-in-one
+
+```bash
+docker build -t arduino && docker run -it -v $(pwd)/projects:/usr/src/app arduino bash
 ```
