@@ -3,3 +3,4 @@ optimizations
 /**/*.elf
 /**/*.hex
 /**/*.bin
+/private/**/*
