@@ -37,10 +37,16 @@ deploy: build
 ## Method 2
 hex:
 	avr-gcc -Os -DF_CPU=16000000UL -mmcu=$(MCU) -c $(path)
-	avr-gcc -DF_CPU=8000000 -mmcu=$(MCU) -o ${shell basename $(path) .c}.elf ${shell basename $(path) .c}.o
-	avr-objcopy -O ihex ${shell basename $(path) .c}.elf ${shell dirname $(path)}/${shell basename $(path) .c}.hex
-	avr-size -C ${shell basename $(path) .c}.o
-	rm ${shell basename $(path) .c}.elf ${shell basename $(path) .c}.o
+	#avr-gcc -DF_CPU=8000000 -mmcu=$(MCU) -o ${shell basename $(path) .c}.elf ${shell basename $(path) .c}.o
+	avr-objcopy -O ihex ${shell basename $(path) .c}.o ${shell dirname $(path)}/${shell basename $(path) .c}.hex
+	#avr-size -C ${shell basename $(path) .c}.o
+	rm ${shell basename $(path) .c}.o
 
 flash: hex
 	avrdude -F -V -c arduino -p $(MCU) -P $(DEFAULT_PORT) -b 11520 -U flash:w:${shell dirname $(path)}/${shell basename $(path) .c}.hex
+
+serial: ## CTRL + A + D to detach
+	screen $(DEFAULT_PORT) 9600 
+
+try: 
+	@echo Hello World!
