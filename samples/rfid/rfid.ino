@@ -22,6 +22,7 @@ void setup()
 
 void loop()
 {
+  
   // Attente d'une carte RFID
   if (!rfid.PICC_IsNewCardPresent())
   {
@@ -41,11 +42,19 @@ void loop()
 
   info();
   //write(rfid, "Anthony", 1);
-  //write(rfid, "DI STEFANO", 2);
+  //write(rfid, "DI STEFANO", 14);
+/*
+  Serial.println("Result: ");
+  Serial.println(read(rfid, 10));
+  Serial.println(read(rfid, 11));
+  Serial.println(read(rfid, 12));*/
 
-  //Serial.println("Result: ");
-  //Serial.println(read(rfid, 1));
-  //Serial.println(read(rfid, 2));
+  //writeAllToBlocks(rfid, "A very long text to be able to test");
+
+  rfid.PICC_HaltA();      // Halt PICC
+  rfid.PCD_StopCrypto1(); // Stop encryption on PCD
+  
+  delay(300000);
 }
 
 /**
@@ -80,7 +89,7 @@ bool auth(MFRC522 rfid, int block)
   for (byte i = 0; i < 6; i++)
     key.keyByte[i] = 0xFF;
 
-  MFRC522::StatusCode status = rfid.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(rfid.uid));
+  MFRC522::StatusCode status = rfid.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_B, block, &key, &(rfid.uid));
 
   if (status != MFRC522::STATUS_OK)
   {
@@ -93,9 +102,41 @@ bool auth(MFRC522 rfid, int block)
   return true;
 }
 
+void writeAllToBlocks(MFRC522 rfid, char content[]) {
+  Serial.println(F("cut string"));
+  int maxSize = 16;
+  int contentLength = strlen(content);
+  int partsCount = ceil(contentLength / maxSize);
+  String result[partsCount + 1];
+  
+  int currentBockNumber = 0;
+
+  for(int i = 0;i < contentLength; i++){
+    if(i > 0 && i % maxSize == 0) {
+      currentBockNumber++;
+    }
+  
+    result[currentBockNumber] += content[i];
+  }
+
+int startBlock = 10;
+  for(int i = 0; i < partsCount + 1; i++) {
+      Serial.print(startBlock);
+      Serial.print(": ");
+      Serial.println(result[i]);
+
+      write(rfid, result[i], startBlock);
+      startBlock++;
+      delay(200);
+  }
+}
+
 void write(MFRC522 rfid, String content, int block)
 {
-  Serial.println("Writing...");
+  Serial.print("Writing ");
+  Serial.print(block);
+  Serial.print(": ");
+  Serial.println(content);
 
   byte buffer[34];
   byte len;
@@ -114,12 +155,11 @@ void write(MFRC522 rfid, String content, int block)
     return;
   }
   else
-    Serial.println(F("MIFARE_Write() success: "));
+    Serial.println(F("MIFARE_Write() success"));
 
   delay(200);
 
-  rfid.PICC_HaltA();      // Halt PICC
-  rfid.PCD_StopCrypto1(); // Stop encryption on PCD
+
 }
 
 String read(MFRC522 rfid, int block)
